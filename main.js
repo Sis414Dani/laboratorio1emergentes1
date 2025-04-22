@@ -65,21 +65,42 @@ let tasks = taskTitles.map((title, index) => {
 
 function loadData() {
   // implementar el renderizado de las tareas
+  if (tasks.length > 0) {
+    taskConatiner.innerHTML = tasks
+      .map((task) => Task.buildTaskCard(task))
+      .join("");
+  } else {
+    taskConatiner.innerHTML = `<div class="text-center text-gray-400 text-2xl">No hay tareas</div>`;
+  }
 }
 
 function postData(event) {
   event.preventDefault();
 
   try {
+    const title = document.getElementById("task-title").value.trim();
+    const description = document.getElementById("task-description").value.trim();
+    const status = document.getElementById("task-status").value;
+
+    if (!title || !description) {
+      showNotification("Por favor completa todos los campos.");
+      return;
+    }
+
+    const task = new Task(title, description, status);
+
+
     // Get form data
 
     saveTask(task);
+    const form = document.getElementById("form-task");
     form.reset();
     const modal = document.getElementById("task-modal");
     modal.checked = false;
     showNotification("Tarea añadida correctamente!");
   } catch (error) {
     showNotification("Error al añadir la tarea. Inténtalo de nuevo.");
+    console.error(error);
   }
 }
 
@@ -91,13 +112,15 @@ function postData(event) {
 
 function saveTask(task) {
   // implementar la creación de la tarea
-  console.log(task);
+  tasks.push(task);
+  console.log(tasks);
 
   loadData();
 }
 
 function deleteTask(id) {
   // implementar la eliminación de la tarea
+  tasks = tasks.filter(task => task.id !== id);
 
   loadData();
 }
